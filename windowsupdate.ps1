@@ -27,7 +27,7 @@ Function show-menu
     param (
         [string]$title = "Windows Update Menu"
     )
-	Write-Host Both options to check will prompt for install afterwards
+    Write-Host Both options to check will prompt to install afterwards
     Write-Host "1: Press '1' to Check for Windows updates from local WSUS Server."
     Write-Host "2: Press '2' to Check for Windows updates from Microsoft."
     Write-Host "Q: Press 'Q' to exit the script."
