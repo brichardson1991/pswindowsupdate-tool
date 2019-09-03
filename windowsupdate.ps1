@@ -1,8 +1,8 @@
 ############################################################################
 #                         Windows Update Tool                              #
 #                      Created by Ben Richardson                           #
-#                            Version 1.4                                   #
-#                             05/02/2019                                   #
+#                            Version 1.5.1                                 #
+#                             25/07/2019                                   #
 ############################################################################
 
 ##Pre-requisites##
@@ -25,13 +25,13 @@ Function show-menu
     param (
         [string]$title = "Windows Update Menu"
 		)
-    Write-Host Please Note: Both options to check will prompt to install afterwards
+    Write-Host "Please Note: Both options to check will prompt for install afterwards" -ForegroundColor green -BackgroundColor black
     Write-Host "1: Press '1' to Check for Windows updates from local WSUS Server."
     Write-Host "2: Press '2' to Check for Windows updates from Microsoft."
     Write-Host "3: Press '3' to Install Windows updates from your local WSUS Server."
-    Write-Host "4: Press '4' to Auto Install Windows updates from your local WSUS Server." "WARNING! This option auto reboots the current computer/server" -ForegroundColor red -BackgroundColor black
+    Write-Host "4: Press '4' to Auto Install Windows updates from your local WSUS Server. " -NoNewline ; write-host "WARNING! This option auto reboots the current computer/server" -ForegroundColor red -BackgroundColor black
     Write-Host "5: Press '5' to Install Windows updates from Microsoft."
-    Write-Host "6: Press '6' to Auto Install Windows updates from Microsoft." "WARNING! This option auto reboots the current computer/server" -ForegroundColor red -BackgroundColor black
+    Write-Host "6: Press '6' to Auto Install Windows updates from Microsoft. " -NoNewline ; write-host  "WARNING! This option auto reboots the current computer/server" -ForegroundColor red -BackgroundColor black
     Write-Host "Q: Press 'Q' to exit the script."
 }
 
@@ -45,15 +45,22 @@ Function WSUS-updates-Check
 	$WSUSInstallPrompt = Read-Host "Would you like to install these updates?"
 	switch ($WSUSInstallPrompt)
 	{
-		'y' 
-			{
-				WSUS-updates-Install
-			}
-		'n' 	
-			{
-				Write-Host "Now Exiting" -ForegroundColor Yellow -BackgroundColor Black
-				exit
-			}
+	'y' {
+			WSUS-updates-Install
+		}
+		
+	'Y' {
+		WSUS-updates-Install
+		}
+		
+	'N' {
+			Write-Host "Now Exiting" -ForegroundColor Yellow -BackgroundColor Black
+			exit
+		}
+	'n' {
+			Write-Host "Now Exiting" -ForegroundColor Yellow -BackgroundColor Black
+			exit
+		}
 	}
 }
 
@@ -66,15 +73,20 @@ Function Microsoft-Update-Check
 	$MicrosoftUpdatePrompt = Read-Host "Would you like to install these updates from Microsoft?"
 	switch ($MicrosoftUpdatePrompt)
 	{
-		'y' 	
-			{
+	'y' {
 				Microsoft-Update-Install
-			}
-		'n' 	
-			{
-				Write-Host "Now Exiting" -ForegroundColor Yellow -BackgroundColor Black
-				exiting
-			}
+		}
+	'Y' {
+				Microsoft-Update-Install
+		}
+	'n' {
+			Write-Host "Now Exiting" -ForegroundColor Yellow -BackgroundColor Black
+			exit
+		}
+	'N' {
+			Write-Host "Now Exiting" -ForegroundColor Yellow -BackgroundColor Black
+			exit
+		}
 	}
 }
 
@@ -90,19 +102,26 @@ Function WSUS-updates-Install
 Function WSUS-updates-Install-Reboot
 {
 	Write-Host ""
-	$WSUSRebootPrompt = Write-Host "This will Automatically RESTART the current computer/server running this script. By continuing you are agreeing to this" -ForegroundColor Red -BackgroundColor Black
+	Write-Host "This will Automatically RESTART the current computer/server running this script. By continuing you are agreeing to this" -ForegroundColor Red -BackgroundColor Black
+	$WSUSRebootPrompt = Read-Host "Type y to agree or n to stop"
 	switch ($WSUSRebootPrompt)
 	{
-			'y'
-				{
-				Get-WindowsUpdate -AcceptAll -Install -Verbose -Autoreboot
-				}
-			'n'
-				{
-					Write-Host "Now Exiting" -ForegroundColor Yellow -BackgroundColor Black
-					exit
-				}
-			
+	'y'{
+			Get-WindowsUpdate -AcceptAll -Install -Verbose -Autoreboot
+		}
+	'n'
+		{
+			Write-Host "Now Exiting" -ForegroundColor Yellow -BackgroundColor Black
+			exit
+		}
+	'Y'{
+			Get-WindowsUpdate -AcceptAll -Install -Verbose -Autoreboot
+		}
+	'N'
+		{
+			Write-Host "Now Exiting" -ForegroundColor Yellow -BackgroundColor Black
+			exit
+		}			
 	}
 }
 
@@ -119,19 +138,24 @@ Function Microsoft-Update-Install
 Function Microsoft-Update-Install-Reboot
 {
 	Write-Host ""
-	$MicrosoftRebootPrompt = Write-Host "This will Automatically RESTART the current computer/server running this script. By continuing you are agreeing to this" -ForegroundColor Red -BackgroundColor Black
+	Write-Host "This will Automatically RESTART the current computer/server running this script. By continuing you are agreeing to this" -ForegroundColor Red -BackgroundColor Black
+	$MicrosoftRebootPrompt = Read-Host "Type y to agree or n to stop"
 	switch ($MicrosoftRebootPrompt)
 	{
-		'y'
-			{
-				Get-WindowsUpdate -MicrosoftUpdate -AcceptAll -Install -Verbose -Autoreboot
-			}
-		'n'
-			{
-				Write-Host "Now Exiting" -ForegroundColor Yellow -BackgroundColor Black
-				exit
-			}
-	
+	'y'	{
+			Get-WindowsUpdate -MicrosoftUpdate -AcceptAll -Install -Verbose -Autoreboot
+		}
+	'n'{
+			Write-Host "Now Exiting" -ForegroundColor Yellow -BackgroundColor Black
+			exit
+		}
+	'Y'	{
+			Get-WindowsUpdate -MicrosoftUpdate -AcceptAll -Install -Verbose -Autoreboot
+		}
+	'N'{
+			Write-Host "Now Exiting" -ForegroundColor Yellow -BackgroundColor Black
+			exit
+		}
 	}
 }
 
@@ -145,7 +169,7 @@ switch ($selection)
 {
     '1' 
 		{
-			WSUS-updates-Check
+		WSUS-updates-Check
 		}
     '2' 
 		{
@@ -173,5 +197,3 @@ switch ($selection)
         exit
 		}
 }
-
-
