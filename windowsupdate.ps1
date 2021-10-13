@@ -1,23 +1,39 @@
 ############################################################################
 #                         Windows Update Tool                              #
 #                      Created by Ben Richardson                           #
-#                            Version 1.5.1                                 #
-#                             25/07/2019                                   #
+#                            Version 1.7.0                                 #
 ############################################################################
+
+<#
+    Last updated: 13-10-2021
+#>
+
 
 ##Pre-requisites##
 
-##Install NuGet as the package provider
-Install-PackageProvider -Name NuGet -Force
+##Check for NuGet Package Provider
+if (Get-PackageProvider -ListAvailable -Name Nuget) {
+    Write-Host "Provider exists"
+    Set-PSRepository -name psgallery -InstallationPolicy Trusted
+} 
+else {
+      Write-Host "Package Provider missing.... Installing now"
+      Install-PackageProvider -Name NuGet
+      Set-PSRepository -name psgallery -InstallationPolicy Trusted
+}
 
-##Set PSGallery as a trusted source
-Set-PSRepository -name psgallery -InstallationPolicy Trusted
+##Check for PSWindowsUpdate Module
+if (Get-Module -ListAvailable -Name pswindowsupdate) {
+    Write-Host "Module exists.....importing now"
+    Update-Module pswindowsupdate
+    Import-Module pswindowsupdate
+} 
+else {
+      Write-Host "Module missing.... Installing now"
+      install-module pswindowsupdate
+      Import-Module pswindowsupdate
+}
 
-##Install PSWindowsUpdate from PSGallery
-Install-module pswindowsupdate -Force
-
-##Import PSWindowsUpdate module to use
-Import-module pswindowsupdate
 
 ##Menu Options##
 Function show-menu
