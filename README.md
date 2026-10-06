@@ -1,4 +1,5 @@
 # pswindowsupdate-tool
+[![Lint](https://github.com/brichardson1991/pswindowsupdate-tool/actions/workflows/lint.yml/badge.svg?branch=master)](https://github.com/brichardson1991/pswindowsupdate-tool/actions/workflows/lint.yml)
 
 A menu-driven PowerShell wrapper around the [PSWindowsUpdate](https://www.powershellgallery.com/packages/PSWindowsUpdate) module. It lets you check for and install Windows updates from a console, without using the Windows Update settings app.
 
