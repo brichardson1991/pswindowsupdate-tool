@@ -1,0 +1,59 @@
+name: Lint
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: PowerShell lint
+    runs-on: windows-latest
+
+    # Windows PowerShell 5.1, the oldest version the script supports.
+    defaults:
+      run:
+        shell: powershell
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Syntax check
+        run: |
+          $failed = $false
+          Get-ChildItem -Path . -Recurse -Include *.ps1, *.psm1, *.psd1 | ForEach-Object {
+              $tokens = $null
+              $errors = $null
+              [System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$tokens, [ref]$errors) | Out-Null
+              foreach ($e in $errors) {
+                  $failed = $true
+                  $file = Resolve-Path -Relative $_.FullName
+                  Write-Output "::error file=$file,line=$($e.Extent.StartLineNumber)::$($e.Message)"
+              }
+          }
+          if ($failed) { exit 1 }
+          Write-Output 'No syntax errors.'
+
+      - name: Install PSScriptAnalyzer
+        run: |
+          [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+          Install-Module -Name PSScriptAnalyzer -Scope CurrentUser -Force
+
+      - name: Run PSScriptAnalyzer
+        run: |
+          $results = @(Invoke-ScriptAnalyzer -Path . -Recurse -Settings ./PSScriptAnalyzerSettings.psd1)
+          foreach ($r in $results) {
+              $level = if ($r.Severity -eq 'Warning') { 'warning' } else { 'error' }
+              $file = Resolve-Path -Relative $r.ScriptPath
+              Write-Output "::$level file=$file,line=$($r.Line)::$($r.RuleName): $($r.Message)"
+          }
+          if ($results.Count -gt 0) {
+              $results | Format-Table -AutoSize -Property Severity, RuleName, ScriptName, Line, Message
+              Write-Error "PSScriptAnalyzer found $($results.Count) issue(s)."
+              exit 1
+          }
+          Write-Output 'PSScriptAnalyzer found no issues.'

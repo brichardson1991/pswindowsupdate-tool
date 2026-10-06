@@ -1,0 +1,6 @@
+# Visual Studio / VS Code workspace state
+.vs/
+.vscode/
+
+# Transcript logs, if -LogDirectory is pointed at the repo folder
+*.log
